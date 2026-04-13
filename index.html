@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dansk Niveautest | Danish Level Test (A2–C2)</title>
+    <style>
+        :root {
+            --primary: #c8102e;
+            --primary-dark: #a00d24;
+            --bg: #fafafa;
+            --card: #ffffff;
+            --text: #1a1a2e;
+            --text-light: #555;
+            --border: #e0e0e0;
+            --success: #2e7d32;
+            --warning: #f57c00;
+            --info: #1565c0;
+            --a2: #4caf50;
+            --b1: #2196f3;
+            --b2: #9c27b0;
+            --c1: #ff9800;
+            --c2: #f44336;
+            --radius: 12px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+        }
+
+        .header h1 { font-size: 1.6rem; font-weight: 700; }
+        .header p { font-size: 0.9rem; opacity: 0.9; margin-top: 4px; }
+
+        .progress-bar {
+            background: rgba(255,255,255,0.2);
+            height: 6px;
+            margin-top: 12px;
+            border-radius: 3px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .progress-fill {
+            background: white;
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 24px 16px;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid var(--border);
+        }
+
+        .card h2 {
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card h3 {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-bottom: 16px;
+        }
+
+        .level-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .level-A2 { background: var(--a2); }
+        .level-B1 { background: var(--b1); }
+        .level-B2 { background: var(--b2); }
+        .level-C1 { background: var(--c1); }
+        .level-C2 { background: var(--c2); }
+
+        .skill-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .skill-reading { background: #e3f2fd; }
+        .skill-writing { background: #fce4ec; }
+        .skill-listening { background: #e8f5e9; }
+        .skill-speaking { background: #fff3e0; }
+
+        .danish-text {
+            background: #f5f5f5;
+            border-left: 4px solid var(--primary);
+            padding: 16px 20px;
+            margin: 16px 0;
+            border-radius: 0 8px 8px 0;
+            font-size: 1rem;
+            line-height: 1.8;
+            color: var(--text);
+        }
+
+        .options { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            font-size: 0.95rem;
+        }
+
+        .option:hover { border-color: var(--primary); background: #fff5f5; }
+        .option.selected { border-color: var(--primary); background: #ffeaea; }
+        .option.correct { border-color: var(--success); background: #e8f5e9; }
+        .option.incorrect { border-color: #d32f2f; background: #ffebee; }
+
+        .option input[type="radio"] { accent-color: var(--primary); width: 18px; height: 18px; }
+
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 14px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: vertical;
+            transition: border-color 0.2s;
+            line-height: 1.6;
+        }
+
+        textarea:focus { outline: none; border-color: var(--primary); }
+
+        .word-count {
+            text-align: right;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-top: 6px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 28px;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-primary:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover { background: #fff5f5; }
+
+        .btn-play {
+            background: var(--success);
+            color: white;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+        }
+
+        .btn-play:hover { background: #1b5e20; }
+
+        .btn-record {
+            background: #d32f2f;
+            color: white;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+        }
+
+        .btn-record:hover { background: #b71c1c; }
+        .btn-record.recording { animation: pulse 1.2s infinite; }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(211,47,47,0.4); }
+            50% { box-shadow: 0 0 0 12px rgba(211,47,47,0); }
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 24px;
+            gap: 12px;
+        }
+
+        .section-intro {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .section-intro .icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        .section-intro h2 { font-size: 1.8rem; margin-bottom: 8px; justify-content: center; }
+        .section-intro p { color: var(--text-light); max-width: 500px; margin: 0 auto 24px; }
+
+        /* Welcome screen */
+        .welcome { text-align: center; padding: 40px 20px; }
+        .welcome h2 { font-size: 2rem; justify-content: center; margin-bottom: 16px; }
+        .welcome .flag { font-size: 4rem; margin-bottom: 16px; }
+
+        .features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 24px 0;
+            text-align: left;
+        }
+
+        .feature {
+            padding: 16px;
+            background: #f8f8f8;
+            border-radius: var(--radius);
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .feature .emoji { font-size: 1.4rem; }
+        .feature h4 { font-size: 0.9rem; margin-bottom: 2px; }
+        .feature p { font-size: 0.8rem; color: var(--text-light); }
+
+        .levels-preview {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .level-chip {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: white;
+        }
+
+        /* Results */
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .result-card {
+            padding: 20px;
+            border-radius: var(--radius);
+            text-align: center;
+            border: 2px solid var(--border);
+        }
+
+        .result-card .score { font-size: 2rem; font-weight: 700; }
+        .result-card .label { font-size: 0.85rem; color: var(--text-light); margin-top: 4px; }
+
+        .overall-result {
+            text-align: center;
+            padding: 32px;
+            background: linear-gradient(135deg, var(--primary), #e91e63);
+            color: white;
+            border-radius: var(--radius);
+            margin: 24px 0;
+        }
+
+        .overall-result .level { font-size: 3rem; font-weight: 800; }
+        .overall-result .desc { font-size: 1.1rem; opacity: 0.9; margin-top: 8px; }
+
+        .skill-breakdown {
+            margin: 24px 0;
+        }
+
+        .skill-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .skill-row:last-child { border-bottom: none; }
+
+        .skill-bar-bg {
+            flex: 1;
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .skill-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+
+        .instructions {
+            background: #fff8e1;
+            border: 1px solid #ffcc02;
+            border-radius: var(--radius);
+            padding: 14px 18px;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .timer {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .hidden { display: none !important; }
+
+        .question-number {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+
+        .audio-visual {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 16px 0;
+            padding: 16px;
+            background: #f5f5f5;
+            border-radius: var(--radius);
+        }
+
+        .audio-wave {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            height: 40px;
+        }
+
+        .audio-wave .bar {
+            width: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+            animation: none;
+        }
+
+        .audio-wave.playing .bar { animation: wave 0.6s ease-in-out infinite alternate; }
+
+        .audio-wave .bar:nth-child(1) { animation-delay: 0s; }
+        .audio-wave .bar:nth-child(2) { animation-delay: 0.1s; }
+        .audio-wave .bar:nth-child(3) { animation-delay: 0.2s; }
+        .audio-wave .bar:nth-child(4) { animation-delay: 0.3s; }
+        .audio-wave .bar:nth-child(5) { animation-delay: 0.4s; }
+
+        @keyframes wave {
+            from { height: 8px; }
+            to { height: 36px; }
+        }
+
+        .recording-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #d32f2f;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .recording-dot {
+            width: 10px; height: 10px;
+            background: #d32f2f;
+            border-radius: 50%;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .transcript-box {
+            background: #f5f5f5;
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            min-height: 80px;
+            margin: 12px 0;
+            font-style: italic;
+            color: var(--text-light);
+        }
+
+        .transcript-box.has-text { font-style: normal; color: var(--text); }
+
+        .prompt-text {
+            font-size: 1.05rem;
+            font-weight: 500;
+            margin: 12px 0 16px;
+        }
+
+        @media (max-width: 600px) {
+            .features { grid-template-columns: 1fr; }
+            .results-grid { grid-template-columns: 1fr; }
+            .card { padding: 20px; }
+            .actions { flex-direction: column; }
+            .actions .btn { width: 100%; justify-content: center; }
+        }
+
+        .cefr-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.85rem; }
+        .cefr-table th, .cefr-table td { padding: 10px 12px; border: 1px solid var(--border); text-align: left; }
+        .cefr-table th { background: #f5f5f5; font-weight: 600; }
+
+        .feedback-box {
+            margin-top: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        .feedback-correct { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+        .feedback-incorrect { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+        .feedback-info { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Dansk Niveautest</h1>
+    <p id="headerSubtitle">Test dit danskniveau fra A2 til C2</p>
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+</div>
+
+<div class="container" id="app">
+    <!-- Welcome Screen -->
+    <div id="screen-welcome" class="card welcome">
+        <div class="flag">🇩🇰</div>
+        <h2>Danish Level Test</h2>
+        <p style="color:var(--text-light); max-width:520px; margin:0 auto 8px;">
+            Find out your Danish proficiency level based on the official <strong>Danskuddannelse</strong> curriculum and <strong>CEFR</strong> framework (A2–C2).
+        </p>
+        <p style="font-size:0.85rem; color:var(--text-light);">
+            Based on Prøve i Dansk 1–3 and Studieprøven exam formats.
+        </p>
+
+        <div class="levels-preview">
+            <span class="level-chip" style="background:var(--a2)">A2</span>
+            <span class="level-chip" style="background:var(--b1)">B1</span>
+            <span class="level-chip" style="background:var(--b2)">B2</span>
+            <span class="level-chip" style="background:var(--c1)">C1</span>
+            <span class="level-chip" style="background:var(--c2)">C2</span>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <span class="emoji">📖</span>
+                <div>
+                    <h4>Læseforståelse</h4>
+                    <p>Reading comprehension at each level</p>
+                </div>
+            </div>
+            <div class="feature">
+                <span class="emoji">✍️</span>
+                <div>
+                    <h4>Skriftlig fremstilling</h4>
+                    <p>Writing tasks with guided prompts</p>
+                </div>
+            </div>
+            <div class="feature">
+                <span class="emoji">🎧</span>
+                <div>
+                    <h4>Høreforståelse</h4>
+                    <p>Listening comprehension with audio</p>
+                </div>
+            </div>
+            <div class="feature">
+                <span class="emoji">🗣️</span>
+                <div>
+                    <h4>Mundtlig kommunikation</h4>
+                    <p>Speaking with voice recognition</p>
+                </div>
+            </div>
+        </div>
+
+        <p style="font-size:0.85rem; color:var(--text-light); margin-bottom:20px;">
+            ~20 questions across 4 skills. Takes about 15–25 minutes.
+        </p>
+
+        <button class="btn btn-primary" onclick="startTest()" style="font-size:1.1rem; padding:14px 40px;">
+            Start Testen
+        </button>
+    </div>
+
+    <!-- Dynamic content inserted here -->
+    <div id="screen-test" class="hidden"></div>
+
+    <!-- Results Screen -->
+    <div id="screen-results" class="hidden"></div>
+</div>
+
+<script>
+// ============================================================
+// QUESTION BANK — Based on Danskuddannelse & Prøve i Dansk
+// ============================================================
+
+const QUESTIONS = {
+
+// ---- READING (Læseforståelse) ----
+reading: [
+    // A2
+    {
+        level: "A2", skill: "reading",
+        text: "Hej! Jeg hedder Maria. Jeg kommer fra Polen, men nu bor jeg i København. Jeg arbejder på et hospital. Jeg kan lide at cykle til arbejde. Om aftenen laver jeg mad og ser fjernsyn. I weekenden besøger jeg min veninde Anna.",
+        question: "Hvad laver Maria om aftenen?",
+        options: [
+            "Hun cykler til arbejde",
+            "Hun laver mad og ser fjernsyn",
+            "Hun besøger sin veninde Anna",
+            "Hun arbejder på hospitalet"
+        ],
+        correct: 1
+    },
+    {
+        level: "A2", skill: "reading",
+        text: "Åbningstider: Mandag–fredag 08:00–17:00. Lørdag 10:00–14:00. Søndag: Lukket. OBS: Den 24. december lukker vi kl. 12:00.",
+        question: "Hvornår lukker butikken om lørdagen?",
+        options: ["Kl. 12:00", "Kl. 14:00", "Kl. 17:00", "Den er lukket"],
+        correct: 1
+    },
+    // B1
+    {
+        level: "B1", skill: "reading",
+        text: "Flere og flere danskere vælger at købe økologiske fødevarer. Ifølge nye tal bruger den gennemsnitlige danske familie omkring 2.500 kr. om måneden på økologisk mad. Eksperter mener, at det skyldes en stigende bevidsthed om sundhed og miljø. Supermarkederne har reageret ved at udvide deres økologiske sortiment, og nogle butikker sælger nu udelukkende økologiske varer.",
+        question: "Hvorfor køber flere danskere økologisk ifølge teksten?",
+        options: [
+            "Fordi det er billigere end almindelig mad",
+            "Fordi supermarkederne tvinger dem til det",
+            "Fordi de er mere bevidste om sundhed og miljø",
+            "Fordi der ikke er andre varer i butikkerne"
+        ],
+        correct: 2
+    },
+    {
+        level: "B1", skill: "reading",
+        text: "Kære Jonas, Tak for din ansøgning til stillingen som tjener. Vi vil gerne invitere dig til en samtale torsdag den 15. marts kl. 10:00 på Restaurant Noma, Refshalevej 96. Medbring venligst dit CV og relevante anbefalinger. Med venlig hilsen, Personalechefen",
+        question: "Hvad skal Jonas medbringe til samtalen?",
+        options: [
+            "En madpakke og sin kalender",
+            "Sit CV og relevante anbefalinger",
+            "Sin uniform og sko",
+            "Et foto og sit pas"
+        ],
+        correct: 1
+    },
+    // B2
+    {
+        level: "B2", skill: "reading",
+        text: "Debatten om kunstig intelligens i den danske folkeskole er blusset op igen. Tilhængere argumenterer for, at AI-værktøjer kan individualisere undervisningen og frigøre lærernes tid til mere personlig kontakt med eleverne. Kritikere frygter derimod, at teknologien kan undergrave elevernes evne til selvstændig tænkning og skabe en uhensigtsmæssig afhængighed af digitale hjælpemidler. Undervisningsministeriet har nedsat en ekspertgruppe, der skal komme med anbefalinger inden sommerferien.",
+        question: "Hvad frygter kritikerne ifølge teksten?",
+        options: [
+            "At lærerne mister deres arbejde",
+            "At elevernes evne til selvstændig tænkning undergraves",
+            "At skolerne ikke har råd til teknologien",
+            "At ekspertgruppen ikke når deadline"
+        ],
+        correct: 1
+    },
+    {
+        level: "B2", skill: "reading",
+        text: "Den danske hygge-kultur er blevet et internationalt fænomen, men begrebet rummer langt mere end stearinlys og varme strømper. Socialforskere peger på, at hygge fundamentalt handler om en demokratisk tilgang til samvær — ingen dominerer samtalen, alle bidrager, og der hersker en implicit aftale om at undgå konflikter. Denne sociale kontrakt kan dog også kritiseres for at fremme konformitet og undertrykke nødvendig uenighed.",
+        question: "Hvad er den centrale pointe om hygge i teksten?",
+        options: [
+            "Det handler primært om mad og drikke",
+            "Det er en demokratisk tilgang til samvær med både fordele og ulemper",
+            "Det er udelukkende positivt for dansk kultur",
+            "Det er noget, kun danskere kan forstå"
+        ],
+        correct: 1
+    },
+    // C1
+    {
+        level: "C1", skill: "reading",
+        text: "Sociolingvistiske studier af dansk sprog i det 21. århundrede afslører en paradoksal udvikling: Mens standarddansk tilsyneladende udbredes gennem medierne, opstår der samtidig nye sociolekter i storbyernes multietniske kvarterer. Disse varieteter, ofte betegnet som 'multietnolekt', inkorporerer fonologiske og syntaktiske træk fra arabisk, tyrkisk og urdu i en dansk grundstruktur. Forskere som Pia Quist har dokumenteret, at disse sproglige innovationer ikke blot er 'fejlagtig dansk', men systematiske lingvistiske nyskabelser, der følger identificerbare grammatiske mønstre. Spørgsmålet er, om denne udvikling på sigt vil berige det danske sprog eller fragmentere det yderligere.",
+        question: "Hvad er den paradoksale udvikling, teksten beskriver?",
+        options: [
+            "Dansk bruges mindre, mens engelsk overtager",
+            "Standarddansk spredes, men nye sociolekter opstår samtidig",
+            "Unge taler bedre dansk end ældre generationer",
+            "Medierne fremmer dialekter frem for standarddansk"
+        ],
+        correct: 1
+    },
+    // C2
+    {
+        level: "C2", skill: "reading",
+        text: "I sin banebrydende afhandling om den danske velfærdsstats genealogi argumenterer historikeren Bo Lidegaard for, at den skandinaviske model ikke primært er et produkt af socialdemokratisk ideologi, men snarere en pragmatisk respons på specifikke historiske betingelser — herunder en relativt homogen befolkning, en stærk andelsbevægelse og fraværet af en dominerende feudal elite. Denne fortolkning udfordrer den teleologiske narrativ, der fremstiller velfærdsstaten som en uundgåelig konsekvens af progressiv politik, og åbner i stedet for en mere kontingent forståelse, hvor institutionelle stisøgninger og historiske tilfældigheder spiller en afgørende rolle. Implikationen er, at modellen ikke uden videre kan eksporteres til samfund med fundamentalt anderledes socioøkonomiske forudsætninger.",
+        question: "Hvad er hovedargumentet i Lidegaards fortolkning?",
+        options: [
+            "Velfærdsstaten skyldes udelukkende socialdemokratisk ideologi",
+            "Den skandinaviske model er let at eksportere til andre lande",
+            "Velfærdsstaten er et resultat af pragmatiske svar på specifikke historiske betingelser, ikke ideologisk uundgåelighed",
+            "Feudale eliter var afgørende for velfærdsstatens opståen"
+        ],
+        correct: 2
+    }
+],
+
+// ---- LISTENING (Høreforståelse) ----
+listening: [
+    {
+        level: "A2", skill: "listening",
+        audioText: "Goddag! Velkommen til lægen. Har du en tid i dag? Hvad hedder du? Okay, sæt dig venligst i venteværelset. Lægen er klar om ti minutter.",
+        question: "Hvor foregår samtalen?",
+        options: ["I supermarkedet", "Hos lægen", "På biblioteket", "I banken"],
+        correct: 1
+    },
+    {
+        level: "A2", skill: "listening",
+        audioText: "Hej, det er DSB kundeservice. Toget fra Odense til København afgår klokken fjorten tredive fra spor tre. Rejsetiden er cirka en time og tredive minutter. God rejse!",
+        question: "Hvornår afgår toget?",
+        options: ["Klokken 13:30", "Klokken 14:30", "Klokken 15:00", "Klokken 12:30"],
+        correct: 1
+    },
+    {
+        level: "B1", skill: "listening",
+        audioText: "I dag har vi talt om det danske sundhedssystem. Som I ved, er det gratis at gå til lægen i Danmark. Men man skal først have et gult sundhedskort. For at få kortet skal man være tilmeldt folkeregistret i sin kommune. Når man er syg, ringer man først til sin egen læge, som så kan henvise til en specialist, hvis det er nødvendigt.",
+        question: "Hvad skal man have for at bruge sundhedssystemet?",
+        options: [
+            "Et blåt EU-kort",
+            "Et gult sundhedskort",
+            "En privat forsikring",
+            "Et brev fra hospitalet"
+        ],
+        correct: 1
+    },
+    {
+        level: "B2", skill: "listening",
+        audioText: "I denne uges afsnit af Kulturen på P1 diskuterer vi den nye trend med podcasts i Danmark. Antallet af danske podcasts er steget med halvtreds procent det seneste år. Medieforskere peger på, at danskerne i stigende grad foretrækker on-demand-indhold, som de kan forbruge i deres eget tempo. Kritikere mener dog, at podcastboomet risikerer at underminere den fælles offentlighed, som traditionelle medier har skabt.",
+        question: "Hvad mener kritikerne om podcastboomet?",
+        options: [
+            "Det er for dyrt for forbrugerne",
+            "Det kan underminere den fælles offentlighed",
+            "Det skaber for mange arbejdspladser",
+            "Det forbedrer kvaliteten af journalistik"
+        ],
+        correct: 1
+    },
+    {
+        level: "C1", skill: "listening",
+        audioText: "Forestil dig følgende scenarie: Du er projektleder i en dansk virksomhed, og dit team består af medarbejdere fra seks forskellige lande. Den danske ledelsesmodel, som bygger på konsensus og flade hierarkier, kolliderer med nogle teammedlemmers forventninger om klare direktiver fra lederen. Forskning i tværkulturel ledelse viser, at den danske tilgang — hvor alle forventes at bidrage ligeværdigt til beslutningsprocessen — kan virke forvirrende eller endda frustrerende for medarbejdere, der er vant til mere hierarkiske strukturer. Spørgsmålet er, hvordan man balancerer respekten for kulturelle forskelle med organisationens behov for effektiv beslutningstagning.",
+        question: "Hvad er den centrale udfordring i scenariet?",
+        options: [
+            "At finde nok medarbejdere til teamet",
+            "At balancere dansk konsensuskultur med medarbejderes forventninger om hierarki",
+            "At oversætte dokumenter til seks sprog",
+            "At reducere antallet af møder"
+        ],
+        correct: 1
+    }
+],
+
+// ---- WRITING (Skriftlig fremstilling) ----
+writing: [
+    {
+        level: "A2", skill: "writing",
+        prompt: "Skriv en kort besked til din nabo. Fortæl, at du holder en fest på lørdag fra kl. 18. Sig undskyld for støjen.",
+        minWords: 20, maxWords: 60,
+        criteria: ["Correct greeting/closing", "Key information (day, time)", "Polite tone", "Basic grammar"]
+    },
+    {
+        level: "B1", skill: "writing",
+        prompt: "Skriv en e-mail til din arbejdsgiver. Du er syg og kan ikke komme på arbejde i dag. Forklar, hvad du fejler, og hvornår du forventer at komme tilbage.",
+        minWords: 40, maxWords: 100,
+        criteria: ["Formal e-mail structure", "Clear explanation", "Time reference", "Appropriate register"]
+    },
+    {
+        level: "B2", skill: "writing",
+        prompt: "Skriv et kort indlæg (80–150 ord) om fordele og ulemper ved at arbejde hjemmefra. Giv din egen holdning.",
+        minWords: 80, maxWords: 150,
+        criteria: ["Balanced argument", "Personal opinion with reasons", "Cohesive connectors", "Complex sentences"]
+    },
+    {
+        level: "C1", skill: "writing",
+        prompt: "I Danmark diskuteres det, om integration bedst fremmes gennem arbejdsmarkedet eller gennem sproguddannelse. Skriv en velargumenteret tekst (120–200 ord), hvor du tager stilling til spørgsmålet.",
+        minWords: 120, maxWords: 200,
+        criteria: ["Thesis + supporting arguments", "Nuanced perspective", "Academic register", "Sophisticated connectors", "Conclusion"]
+    },
+    {
+        level: "C2", skill: "writing",
+        prompt: "Analysér følgende påstand: 'Den danske jantelov er den største hindring for innovation i Skandinavien.' Diskutér med reference til kultur, økonomi og samfund (150–250 ord).",
+        minWords: 150, maxWords: 250,
+        criteria: ["Critical analysis", "Multiple perspectives", "Cultural/economic references", "Near-native fluency", "Rhetorical sophistication"]
+    }
+],
+
+// ---- SPEAKING (Mundtlig kommunikation) ----
+speaking: [
+    {
+        level: "A2", skill: "speaking",
+        prompt: "Præsentér dig selv: Sig dit navn, hvor du kommer fra, hvad du laver, og hvad du kan lide at lave i din fritid.",
+        duration: 30,
+        criteria: ["Basic personal information", "Simple sentences", "Understandable pronunciation"]
+    },
+    {
+        level: "B1", skill: "speaking",
+        prompt: "Fortæl om en oplevelse, du har haft i Danmark. Hvad skete der? Hvad syntes du om det?",
+        duration: 45,
+        criteria: ["Past tense usage", "Connected narrative", "Expression of opinion", "Adequate vocabulary"]
+    },
+    {
+        level: "B2", skill: "speaking",
+        prompt: "Hvad synes du om det danske uddannelsessystem? Sammenlign det med uddannelsessystemet i dit hjemland. Giv eksempler.",
+        duration: 60,
+        criteria: ["Comparison structure", "Specific examples", "Fluent delivery", "Complex grammar"]
+    },
+    {
+        level: "C1", skill: "speaking",
+        prompt: "Diskutér, om Danmark bør indføre obligatorisk værnepligt for alle — uanset køn. Argumentér for og imod, og giv din egen konklusion.",
+        duration: 90,
+        criteria: ["Structured argumentation", "Abstract reasoning", "Near-spontaneous delivery", "Sophisticated vocabulary"]
+    }
+]
+};
+
+// ============================================================
+// TEST ENGINE
+// ============================================================
+
+let state = {
+    currentSection: null, // 'reading', 'listening', 'writing', 'speaking'
+    currentIndex: 0,
+    answers: { reading: [], listening: [], writing: [], speaking: [] },
+    scores: { reading: 0, listening: 0, writing: 0, speaking: 0 },
+    totalQuestions: 0,
+    answeredQuestions: 0,
+    speechSynth: window.speechSynthesis,
+    recognition: null,
+    isRecording: false,
+    recordingText: '',
+    sectionOrder: ['reading', 'listening', 'writing', 'speaking'],
+    sectionIndex: 0
+};
+
+function startTest() {
+    state.sectionIndex = 0;
+    state.totalQuestions =
+        QUESTIONS.reading.length +
+        QUESTIONS.listening.length +
+        QUESTIONS.writing.length +
+        QUESTIONS.speaking.length;
+    state.answeredQuestions = 0;
+    showSectionIntro('reading');
+}
+
+function showSectionIntro(section) {
+    state.currentSection = section;
+    state.currentIndex = 0;
+    document.getElementById('screen-welcome').classList.add('hidden');
+    document.getElementById('screen-results').classList.add('hidden');
+    const testEl = document.getElementById('screen-test');
+    testEl.classList.remove('hidden');
+
+    const intros = {
+        reading: { icon: '📖', title: 'Læseforståelse', subtitle: 'Reading Comprehension', desc: `Read Danish texts and answer questions. ${QUESTIONS.reading.length} questions from A2 to C2.` },
+        listening: { icon: '🎧', title: 'Høreforståelse', subtitle: 'Listening Comprehension', desc: `Listen to Danish audio and answer questions. ${QUESTIONS.listening.length} questions. Press play to hear each text.` },
+        writing: { icon: '✍️', title: 'Skriftlig fremstilling', subtitle: 'Writing', desc: `Write Danish texts based on prompts. ${QUESTIONS.writing.length} tasks from A2 to C2.` },
+        speaking: { icon: '🗣️', title: 'Mundtlig kommunikation', subtitle: 'Speaking', desc: `Speak Danish using your microphone. ${QUESTIONS.speaking.length} tasks. Uses browser speech recognition.` }
+    };
+
+    const info = intros[section];
+    testEl.innerHTML = `
+        <div class="card section-intro">
+            <div class="icon">${info.icon}</div>
+            <h2>${info.title}</h2>
+            <h3>${info.subtitle}</h3>
+            <p>${info.desc}</p>
+            ${section === 'listening' ? '<p style="font-size:0.85rem;color:var(--warning);margin-top:8px;">Requires speakers or headphones. Uses browser text-to-speech.</p>' : ''}
+            ${section === 'speaking' ? '<p style="font-size:0.85rem;color:var(--warning);margin-top:8px;">Requires microphone access. Uses browser speech recognition (Chrome recommended).</p>' : ''}
+            <button class="btn btn-primary" onclick="showQuestion()" style="margin-top:20px;">
+                Start ${info.title}
+            </button>
+        </div>
+    `;
+}
+
+function updateProgress() {
+    const pct = (state.answeredQuestions / state.totalQuestions) * 100;
+    document.getElementById('progressFill').style.width = pct + '%';
+}
+
+function showQuestion() {
+    const section = state.currentSection;
+    const questions = QUESTIONS[section];
+    const idx = state.currentIndex;
+    const q = questions[idx];
+    const testEl = document.getElementById('screen-test');
+
+    const qNum = idx + 1;
+    const qTotal = questions.length;
+
+    if (section === 'reading') renderReadingQuestion(testEl, q, qNum, qTotal);
+    else if (section === 'listening') renderListeningQuestion(testEl, q, qNum, qTotal);
+    else if (section === 'writing') renderWritingQuestion(testEl, q, qNum, qTotal);
+    else if (section === 'speaking') renderSpeakingQuestion(testEl, q, qNum, qTotal);
+}
+
+// ---- READING ----
+function renderReadingQuestion(el, q, num, total) {
+    el.innerHTML = `
+        <div class="card">
+            <div class="question-number">Spørgsmål ${num} af ${total}</div>
+            <h2>
+                <div class="skill-icon skill-reading">📖</div>
+                Læseforståelse
+                <span class="level-badge level-${q.level}">${q.level}</span>
+            </h2>
+            <div class="instructions">💡 Læs teksten og vælg det rigtige svar.</div>
+            <div class="danish-text">${q.text}</div>
+            <p class="prompt-text">${q.question}</p>
+            <div class="options" id="optionsContainer">
+                ${q.options.map((opt, i) => `
+                    <label class="option" id="opt-${i}" onclick="selectOption(${i})">
+                        <input type="radio" name="answer" value="${i}">
+                        <span>${opt}</span>
+                    </label>
+                `).join('')}
+            </div>
+            <div id="feedback"></div>
+            <div class="actions">
+                <span class="timer">
+                    <span class="level-badge level-${q.level}">${q.level}</span>
+                    ${num}/${total}
+                </span>
+                <button class="btn btn-primary" id="nextBtn" onclick="submitMCQ()" disabled>
+                    Tjek svar
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function selectOption(idx) {
+    document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+    document.getElementById('opt-' + idx).classList.add('selected');
+    document.querySelector(`#opt-${idx} input`).checked = true;
+    document.getElementById('nextBtn').disabled = false;
+    state._selectedOption = idx;
+}
+
+function submitMCQ() {
+    const q = QUESTIONS[state.currentSection][state.currentIndex];
+    const selected = state._selectedOption;
+    const btn = document.getElementById('nextBtn');
+
+    if (btn.textContent.trim() === 'Næste') {
+        advanceQuestion();
+        return;
+    }
+
+    // Show feedback
+    const correct = selected === q.correct;
+    document.querySelectorAll('.option').forEach((o, i) => {
+        o.style.pointerEvents = 'none';
+        if (i === q.correct) o.classList.add('correct');
+        if (i === selected && !correct) o.classList.add('incorrect');
+    });
+
+    const fb = document.getElementById('feedback');
+    if (correct) {
+        fb.innerHTML = `<div class="feedback-box feedback-correct">✓ Korrekt!</div>`;
+        state.scores[state.currentSection] += levelPoints(q.level);
+    } else {
+        fb.innerHTML = `<div class="feedback-box feedback-incorrect">✗ Forkert. Det rigtige svar er markeret med grønt.</div>`;
+    }
+
+    state.answers[state.currentSection].push({ level: q.level, correct });
+    state.answeredQuestions++;
+    updateProgress();
+
+    btn.textContent = 'Næste';
+}
+
+// ---- LISTENING ----
+function renderListeningQuestion(el, q, num, total) {
+    el.innerHTML = `
+        <div class="card">
+            <div class="question-number">Spørgsmål ${num} af ${total}</div>
+            <h2>
+                <div class="skill-icon skill-listening">🎧</div>
+                Høreforståelse
+                <span class="level-badge level-${q.level}">${q.level}</span>
+            </h2>
+            <div class="instructions">💡 Tryk på afspil-knappen for at lytte. Du kan lytte op til 3 gange.</div>
+            <div class="audio-visual">
+                <button class="btn btn-play" id="playBtn" onclick="playAudio()">
+                    ▶ Afspil
+                </button>
+                <div class="audio-wave" id="audioWave">
+                    <div class="bar" style="height:12px"></div>
+                    <div class="bar" style="height:20px"></div>
+                    <div class="bar" style="height:28px"></div>
+                    <div class="bar" style="height:16px"></div>
+                    <div class="bar" style="height:24px"></div>
+                </div>
+                <span id="playCount" style="font-size:0.8rem; color:var(--text-light);">0/3 afspilninger</span>
+            </div>
+            <p class="prompt-text">${q.question}</p>
+            <div class="options" id="optionsContainer">
+                ${q.options.map((opt, i) => `
+                    <label class="option" id="opt-${i}" onclick="selectOption(${i})">
+                        <input type="radio" name="answer" value="${i}">
+                        <span>${opt}</span>
+                    </label>
+                `).join('')}
+            </div>
+            <div id="feedback"></div>
+            <div class="actions">
+                <span class="timer">
+                    <span class="level-badge level-${q.level}">${q.level}</span>
+                    ${num}/${total}
+                </span>
+                <button class="btn btn-primary" id="nextBtn" onclick="submitMCQ()" disabled>
+                    Tjek svar
+                </button>
+            </div>
+        </div>
+    `;
+    state._playCount = 0;
+    state._audioText = q.audioText;
+}
+
+function playAudio() {
+    if (state._playCount >= 3) return;
+    state._playCount++;
+    document.getElementById('playCount').textContent = `${state._playCount}/3 afspilninger`;
+
+    if (state._playCount >= 3) {
+        document.getElementById('playBtn').disabled = true;
+        document.getElementById('playBtn').style.opacity = '0.5';
+    }
+
+    const utterance = new SpeechSynthesisUtterance(state._audioText);
+    utterance.lang = 'da-DK';
+    utterance.rate = 0.9;
+
+    // Try to find a Danish voice
+    const voices = state.speechSynth.getVoices();
+    const daVoice = voices.find(v => v.lang.startsWith('da'));
+    if (daVoice) utterance.voice = daVoice;
+
+    const wave = document.getElementById('audioWave');
+    utterance.onstart = () => wave.classList.add('playing');
+    utterance.onend = () => wave.classList.remove('playing');
+
+    state.speechSynth.cancel();
+    state.speechSynth.speak(utterance);
+}
+
+// Preload voices
+if (window.speechSynthesis) {
+    speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+    speechSynthesis.getVoices();
+}
+
+// ---- WRITING ----
+function renderWritingQuestion(el, q, num, total) {
+    el.innerHTML = `
+        <div class="card">
+            <div class="question-number">Opgave ${num} af ${total}</div>
+            <h2>
+                <div class="skill-icon skill-writing">✍️</div>
+                Skriftlig fremstilling
+                <span class="level-badge level-${q.level}">${q.level}</span>
+            </h2>
+            <div class="instructions">💡 Skriv din tekst på dansk. Mål: ${q.minWords}–${q.maxWords} ord.</div>
+            <p class="prompt-text">${q.prompt}</p>
+            <textarea id="writingInput" placeholder="Skriv dit svar her..." oninput="updateWordCount()"></textarea>
+            <div class="word-count" id="wordCount">0 ord (mål: ${q.minWords}–${q.maxWords})</div>
+            <div style="margin-top:12px;">
+                <strong style="font-size:0.85rem;">Bedømmelseskriterier:</strong>
+                <ul style="font-size:0.8rem; color:var(--text-light); margin-top:4px; padding-left:20px;">
+                    ${q.criteria.map(c => `<li>${c}</li>`).join('')}
+                </ul>
+            </div>
+            <div id="feedback"></div>
+            <div class="actions">
+                <span class="timer">
+                    <span class="level-badge level-${q.level}">${q.level}</span>
+                    ${num}/${total}
+                </span>
+                <button class="btn btn-primary" id="nextBtn" onclick="submitWriting()">
+                    Indsend
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function updateWordCount() {
+    const text = document.getElementById('writingInput').value.trim();
+    const words = text ? text.split(/\s+/).length : 0;
+    const q = QUESTIONS.writing[state.currentIndex];
+    const el = document.getElementById('wordCount');
+    el.textContent = `${words} ord (mål: ${q.minWords}–${q.maxWords})`;
+    if (words >= q.minWords && words <= q.maxWords) el.style.color = 'var(--success)';
+    else if (words > q.maxWords) el.style.color = '#d32f2f';
+    else el.style.color = 'var(--text-light)';
+}
+
+function submitWriting() {
+    const btn = document.getElementById('nextBtn');
+    if (btn.textContent.trim() === 'Næste') { advanceQuestion(); return; }
+
+    const text = document.getElementById('writingInput').value.trim();
+    const words = text ? text.split(/\s+/).length : 0;
+    const q = QUESTIONS.writing[state.currentIndex];
+
+    let score = 0;
+    let feedback = [];
+
+    if (words === 0) {
+        feedback.push('Du har ikke skrevet noget.');
+    } else {
+        // Word count check
+        if (words >= q.minWords) {
+            score += 2;
+            feedback.push(`✓ Ordantal OK (${words} ord)`);
+        } else {
+            feedback.push(`✗ For kort (${words}/${q.minWords} ord)`);
+        }
+
+        // Basic Danish detection
+        const danishWords = ['og', 'er', 'det', 'en', 'jeg', 'har', 'til', 'at', 'med', 'som', 'kan', 'vil', 'skal', 'den', 'min', 'din', 'ikke', 'men', 'også', 'fra', 'var', 'blev', 'hvor', 'hvad', 'når', 'eller', 'efter', 'over', 'under', 'mellem', 'fordi', 'derfor', 'selvom', 'således', 'imidlertid', 'desuden'];
+        const textWords = text.toLowerCase().split(/\s+/);
+        const danishCount = textWords.filter(w => danishWords.includes(w)).length;
+        const danishRatio = danishCount / textWords.length;
+
+        if (danishRatio > 0.15) {
+            score += 2;
+            feedback.push('✓ Teksten er på dansk');
+        } else {
+            feedback.push('✗ Teksten ser ikke ud til at være på dansk');
+        }
+
+        // Sentence structure
+        const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+        if (sentences.length >= 2) {
+            score += 1;
+            feedback.push(`✓ ${sentences.length} sætninger`);
+        }
+
+        // Level-appropriate complexity
+        const avgWordLen = textWords.reduce((a, w) => a + w.length, 0) / textWords.length;
+        const complexConnectors = ['desuden', 'imidlertid', 'derimod', 'dog', 'således', 'endvidere', 'tilsyneladende', 'grundlæggende', 'nødvendigvis', 'selvom', 'fordi', 'eftersom', 'trods', 'idet'];
+        const usedConnectors = complexConnectors.filter(c => text.toLowerCase().includes(c));
+
+        if (q.level === 'C1' || q.level === 'C2') {
+            if (usedConnectors.length >= 2) { score += 2; feedback.push(`✓ Komplekse konnektorer brugt (${usedConnectors.join(', ')})`); }
+            else feedback.push('△ Brug flere komplekse forbindelsesord for dette niveau');
+        } else if (q.level === 'B2') {
+            if (usedConnectors.length >= 1) { score += 1; feedback.push('✓ God brug af forbindelsesord'); }
+        } else {
+            score += 1;
+        }
+    }
+
+    // Scale to level points
+    const maxPossible = 7;
+    const scaledScore = Math.round((score / maxPossible) * levelPoints(q.level));
+    state.scores.writing += scaledScore;
+    state.answers.writing.push({ level: q.level, score: scaledScore, maxScore: levelPoints(q.level) });
+    state.answeredQuestions++;
+    updateProgress();
+
+    const fb = document.getElementById('feedback');
+    fb.innerHTML = `
+        <div class="feedback-box feedback-info">
+            <strong>Automatisk vurdering:</strong> ${scaledScore}/${levelPoints(q.level)} point<br>
+            ${feedback.join('<br>')}
+            <br><em style="font-size:0.8rem;">Note: Fuld vurdering af skriveevner kræver en menneskelig bedømmer.</em>
+        </div>
+    `;
+
+    document.getElementById('writingInput').disabled = true;
+    btn.textContent = 'Næste';
+}
+
+// ---- SPEAKING ----
+function renderSpeakingQuestion(el, q, num, total) {
+    const hasSpeechRecognition = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+
+    el.innerHTML = `
+        <div class="card">
+            <div class="question-number">Opgave ${num} af ${total}</div>
+            <h2>
+                <div class="skill-icon skill-speaking">🗣️</div>
+                Mundtlig kommunikation
+                <span class="level-badge level-${q.level}">${q.level}</span>
+            </h2>
+            <div class="instructions">💡 Tryk på optag-knappen og tal på dansk. Tidsmål: ca. ${q.duration} sekunder.</div>
+            <p class="prompt-text">${q.prompt}</p>
+            ${hasSpeechRecognition ? `
+                <div style="text-align:center; margin:20px 0;">
+                    <button class="btn btn-record" id="recordBtn" onclick="toggleRecording()">
+                        🎙 Start optagelse
+                    </button>
+                    <div id="recordingIndicator" class="recording-indicator hidden" style="justify-content:center; margin-top:12px;">
+                        <span class="recording-dot"></span>
+                        Optager... <span id="recordTimer">0s</span> / ${q.duration}s
+                    </div>
+                </div>
+                <div class="transcript-box" id="transcript">Din tale vises her...</div>
+            ` : `
+                <div class="instructions" style="background:#ffebee; border-color:#ef9a9a;">
+                    ⚠️ Din browser understøtter ikke tale-genkendelse. Brug Chrome for den bedste oplevelse.
+                    <br><br>Alternativt: Skriv hvad du <em>ville</em> have sagt herunder.
+                </div>
+                <textarea id="speakingFallback" placeholder="Skriv dit mundtlige svar her..." style="min-height:100px;"></textarea>
+            `}
+            <div style="margin-top:12px;">
+                <strong style="font-size:0.85rem;">Bedømmelseskriterier:</strong>
+                <ul style="font-size:0.8rem; color:var(--text-light); margin-top:4px; padding-left:20px;">
+                    ${q.criteria.map(c => `<li>${c}</li>`).join('')}
+                </ul>
+            </div>
+            <div id="feedback"></div>
+            <div class="actions">
+                <span class="timer">
+                    <span class="level-badge level-${q.level}">${q.level}</span>
+                    ${num}/${total}
+                </span>
+                <button class="btn btn-primary" id="nextBtn" onclick="submitSpeaking()">
+                    Indsend
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function toggleRecording() {
+    if (state.isRecording) {
+        stopRecording();
+    } else {
+        startRecording();
+    }
+}
+
+function startRecording() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+
+    state.recognition = new SpeechRecognition();
+    state.recognition.lang = 'da-DK';
+    state.recognition.continuous = true;
+    state.recognition.interimResults = true;
+
+    state.recordingText = '';
+    let startTime = Date.now();
+
+    state.recognition.onresult = (event) => {
+        let interim = '';
+        let final = '';
+        for (let i = 0; i < event.results.length; i++) {
+            if (event.results[i].isFinal) {
+                final += event.results[i][0].transcript + ' ';
+            } else {
+                interim += event.results[i][0].transcript;
+            }
+        }
+        state.recordingText = final;
+        const el = document.getElementById('transcript');
+        el.textContent = final + interim;
+        el.classList.add('has-text');
+    };
+
+    state.recognition.onerror = (e) => {
+        if (e.error !== 'no-speech') console.error('Speech error:', e.error);
+    };
+
+    state.recognition.onend = () => {
+        if (state.isRecording) state.recognition.start(); // Keep going
+    };
+
+    state.recognition.start();
+    state.isRecording = true;
+
+    const btn = document.getElementById('recordBtn');
+    btn.textContent = '⏹ Stop optagelse';
+    btn.classList.add('recording');
+    document.getElementById('recordingIndicator').classList.remove('hidden');
+
+    // Timer
+    state._recordInterval = setInterval(() => {
+        const elapsed = Math.round((Date.now() - startTime) / 1000);
+        const timerEl = document.getElementById('recordTimer');
+        if (timerEl) timerEl.textContent = elapsed + 's';
+        const q = QUESTIONS.speaking[state.currentIndex];
+        if (elapsed >= q.duration) stopRecording();
+    }, 1000);
+}
+
+function stopRecording() {
+    if (state.recognition) {
+        state.recognition.onend = null;
+        state.recognition.stop();
+    }
+    state.isRecording = false;
+    clearInterval(state._recordInterval);
+
+    const btn = document.getElementById('recordBtn');
+    if (btn) {
+        btn.textContent = '🎙 Optag igen';
+        btn.classList.remove('recording');
+    }
+    const indicator = document.getElementById('recordingIndicator');
+    if (indicator) indicator.classList.add('hidden');
+}
+
+function submitSpeaking() {
+    const btn = document.getElementById('nextBtn');
+    if (btn.textContent.trim() === 'Næste') { advanceQuestion(); return; }
+
+    stopRecording();
+
+    const q = QUESTIONS.speaking[state.currentIndex];
+    const fallback = document.getElementById('speakingFallback');
+    const text = state.recordingText || (fallback ? fallback.value : '');
+    const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+
+    let score = 0;
+    let feedback = [];
+
+    if (words === 0) {
+        feedback.push('Ingen tale registreret.');
+    } else {
+        // Word count (longer = more fluent)
+        const expectedWords = q.duration * 1.5; // ~1.5 words per second
+        const fluencyRatio = Math.min(words / expectedWords, 1);
+        score += Math.round(fluencyRatio * 3);
+        feedback.push(`✓ ${words} ord registreret`);
+
+        // Danish content
+        const danishWords = ['og', 'er', 'det', 'en', 'jeg', 'har', 'til', 'at', 'med', 'som', 'kan', 'vil', 'ikke', 'men', 'også', 'fra', 'min', 'den', 'var'];
+        const textWords = text.toLowerCase().split(/\s+/);
+        const danishCount = textWords.filter(w => danishWords.includes(w)).length;
+        if (danishCount / textWords.length > 0.1) {
+            score += 2;
+            feedback.push('✓ Dansk tale genkendt');
+        } else {
+            feedback.push('△ Svært at genkende dansk indhold');
+        }
+
+        // Sentence length variety
+        if (words > 10) { score += 1; feedback.push('✓ Tilstrækkelig længde'); }
+    }
+
+    const maxPossible = 6;
+    const scaledScore = Math.round((score / maxPossible) * levelPoints(q.level));
+    state.scores.speaking += scaledScore;
+    state.answers.speaking.push({ level: q.level, score: scaledScore, maxScore: levelPoints(q.level) });
+    state.answeredQuestions++;
+    updateProgress();
+
+    const fb = document.getElementById('feedback');
+    fb.innerHTML = `
+        <div class="feedback-box feedback-info">
+            <strong>Automatisk vurdering:</strong> ${scaledScore}/${levelPoints(q.level)} point<br>
+            ${feedback.join('<br>')}
+            <br><em style="font-size:0.8rem;">Note: Fuld vurdering af udtale og flydende tale kræver en menneskelig bedømmer.</em>
+        </div>
+    `;
+
+    btn.textContent = 'Næste';
+}
+
+// ---- NAVIGATION ----
+function advanceQuestion() {
+    const section = state.currentSection;
+    state.currentIndex++;
+
+    if (state.currentIndex >= QUESTIONS[section].length) {
+        // Move to next section
+        state.sectionIndex++;
+        if (state.sectionIndex >= state.sectionOrder.length) {
+            showResults();
+        } else {
+            showSectionIntro(state.sectionOrder[state.sectionIndex]);
+        }
+    } else {
+        showQuestion();
+    }
+}
+
+function levelPoints(level) {
+    return { A2: 2, B1: 3, B2: 4, C1: 5, C2: 6 }[level] || 1;
+}
+
+// ---- RESULTS ----
+function showResults() {
+    document.getElementById('screen-test').classList.add('hidden');
+    document.getElementById('screen-results').classList.remove('hidden');
+    document.getElementById('progressFill').style.width = '100%';
+
+    // Calculate max possible scores per skill
+    const maxScores = {};
+    for (const skill of ['reading', 'listening', 'writing', 'speaking']) {
+        maxScores[skill] = QUESTIONS[skill].reduce((sum, q) => sum + levelPoints(q.level), 0);
+    }
+
+    const totalScore = Object.values(state.scores).reduce((a, b) => a + b, 0);
+    const totalMax = Object.values(maxScores).reduce((a, b) => a + b, 0);
+    const overallPct = totalScore / totalMax;
+
+    // Determine level
+    let overallLevel, levelDesc;
+    if (overallPct >= 0.85) { overallLevel = 'C2'; levelDesc = 'Mastery — near-native proficiency'; }
+    else if (overallPct >= 0.70) { overallLevel = 'C1'; levelDesc = 'Advanced — effective, flexible use'; }
+    else if (overallPct >= 0.55) { overallLevel = 'B2'; levelDesc = 'Upper Intermediate — fluent interaction'; }
+    else if (overallPct >= 0.38) { overallLevel = 'B1'; levelDesc = 'Intermediate — functional fluency'; }
+    else { overallLevel = 'A2'; levelDesc = 'Elementary — routine situations'; }
+
+    // Per-skill levels
+    function skillLevel(skill) {
+        const pct = maxScores[skill] > 0 ? state.scores[skill] / maxScores[skill] : 0;
+        if (pct >= 0.85) return 'C2';
+        if (pct >= 0.70) return 'C1';
+        if (pct >= 0.55) return 'B2';
+        if (pct >= 0.38) return 'B1';
+        return 'A2';
+    }
+
+    const levelDescriptions = {
+        A2: 'You can handle basic, routine situations and understand simple texts about familiar topics. Equivalent to Prøve i Dansk 1.',
+        B1: 'You can deal with most situations while travelling in Denmark and produce simple connected text. Equivalent to Prøve i Dansk 2 (required for permanent residency).',
+        B2: 'You can interact fluently and understand complex texts on both concrete and abstract topics. Equivalent to Prøve i Dansk 3 (required for Danish citizenship).',
+        C1: 'You can express yourself fluently and use language flexibly for academic and professional purposes. Equivalent to Studieprøven (required for university admission).',
+        C2: 'You can understand virtually everything and express yourself spontaneously with precision. Near-native mastery of Danish.'
+    };
+
+    const skillNames = { reading: 'Læseforståelse', listening: 'Høreforståelse', writing: 'Skriftlig fremstilling', speaking: 'Mundtlig kommunikation' };
+    const skillColors = { reading: '#2196f3', listening: '#4caf50', writing: '#e91e63', speaking: '#ff9800' };
+
+    const el = document.getElementById('screen-results');
+    el.innerHTML = `
+        <div class="card">
+            <div class="overall-result">
+                <div style="font-size:0.9rem; opacity:0.8;">Dit estimerede danskniveau</div>
+                <div class="level">${overallLevel}</div>
+                <div class="desc">${levelDesc}</div>
+                <div style="margin-top:12px; font-size:0.9rem;">${totalScore} / ${totalMax} point (${Math.round(overallPct * 100)}%)</div>
+            </div>
+
+            <p style="color:var(--text-light); font-size:0.9rem; text-align:center; margin: 16px 0;">
+                ${levelDescriptions[overallLevel]}
+            </p>
+
+            <h3 style="margin:24px 0 12px;">Resultater pr. færdighed</h3>
+            <div class="skill-breakdown">
+                ${['reading', 'listening', 'writing', 'speaking'].map(skill => {
+                    const pct = maxScores[skill] > 0 ? Math.round((state.scores[skill] / maxScores[skill]) * 100) : 0;
+                    const sl = skillLevel(skill);
+                    return `
+                        <div class="skill-row">
+                            <span style="width:160px; font-size:0.9rem;">${skillNames[skill]}</span>
+                            <div class="skill-bar-bg">
+                                <div class="skill-bar-fill" style="width:${pct}%; background:${skillColors[skill]}"></div>
+                            </div>
+                            <span class="level-badge level-${sl}" style="min-width:36px; text-align:center;">${sl}</span>
+                            <span style="font-size:0.8rem; color:var(--text-light); min-width:40px; text-align:right;">${pct}%</span>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+
+            <h3 style="margin:24px 0 12px;">CEFR-niveauer og Prøve i Dansk</h3>
+            <table class="cefr-table">
+                <tr><th>Niveau</th><th>Eksamen</th><th>Betydning</th></tr>
+                <tr><td><span class="level-badge level-A2">A2</span></td><td>Prøve i Dansk 1</td><td>Grundlæggende kommunikation</td></tr>
+                <tr><td><span class="level-badge level-B1">B1</span></td><td>Prøve i Dansk 2</td><td>Kræves til permanent opholdstilladelse</td></tr>
+                <tr><td><span class="level-badge level-B2">B2</span></td><td>Prøve i Dansk 3</td><td>Kræves til dansk statsborgerskab</td></tr>
+                <tr><td><span class="level-badge level-C1">C1</span></td><td>Studieprøven</td><td>Kræves til universitetsuddannelse</td></tr>
+                <tr><td><span class="level-badge level-C2">C2</span></td><td>—</td><td>Tilnærmelsesvis indfødt niveau</td></tr>
+            </table>
+
+            <h3 style="margin:24px 0 12px;">Anbefalinger</h3>
+            <div id="recommendations"></div>
+
+            <div class="actions" style="justify-content:center; margin-top:32px;">
+                <button class="btn btn-primary" onclick="location.reload()">Tag testen igen</button>
+            </div>
+        </div>
+    `;
+
+    // Recommendations
+    const recs = document.getElementById('recommendations');
+    const weakest = Object.entries(state.scores).sort((a, b) => {
+        const pctA = maxScores[a[0]] > 0 ? a[1] / maxScores[a[0]] : 0;
+        const pctB = maxScores[b[0]] > 0 ? b[1] / maxScores[b[0]] : 0;
+        return pctA - pctB;
+    });
+
+    const recTexts = {
+        reading: 'Læs danske aviser (DR Nyheder, Politiken) og bøger tilpasset dit niveau. Start med lettere tekster og arbejd dig op.',
+        listening: 'Lyt til danske podcasts (f.eks. "Genstart" på DR) og se danske tv-serier med undertekster. Øv dig dagligt.',
+        writing: 'Øv dig i at skrive e-mails, dagbog og korte tekster på dansk. Få feedback fra en dansklærer eller sprogpartner.',
+        speaking: 'Find en sprogpartner eller deltag i sprogcafé. Øv udtale med apps som Duolingo eller Babbel. Tal dansk hver dag.'
+    };
+
+    recs.innerHTML = weakest.slice(0, 2).map(([skill]) => `
+        <div class="feedback-box feedback-info" style="margin-bottom:8px;">
+            <strong>${skillNames[skill]}:</strong> ${recTexts[skill]}
+        </div>
+    `).join('');
+
+    // Animate bars
+    setTimeout(() => {
+        document.querySelectorAll('.skill-bar-fill').forEach(bar => {
+            bar.style.width = bar.style.width; // trigger reflow
+        });
+    }, 100);
+}
+</script>
+
+</body>
+</html>
