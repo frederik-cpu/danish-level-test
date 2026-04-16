@@ -1095,7 +1095,7 @@ async function playAudio() {
             document.getElementById('playBtn').disabled = true;
 
             const response = await fetch(
-                `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`,
+                `https://texttospeech.googleapis.com/v1beta1/text:synthesize?key=${apiKey}`,
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -1103,13 +1103,11 @@ async function playAudio() {
                         input: { text: state._audioText },
                         voice: {
                             languageCode: 'da-DK',
-                            name: 'da-DK-Wavenet-A',
-                            ssmlGender: 'FEMALE'
+                            name: 'da-DK-Chirp-HD-F'
                         },
                         audioConfig: {
                             audioEncoding: 'MP3',
-                            speakingRate: 0.9,
-                            pitch: 0
+                            speakingRate: 0.9
                         }
                     })
                 }
