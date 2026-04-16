@@ -992,7 +992,7 @@ function renderReadingQuestion(el, q, num, total) {
                     ${num}/${total}
                 </span>
                 <button class="btn btn-primary" id="nextBtn" onclick="submitMCQ()" disabled>
-                    Tjek svar
+                    Næste
                 </button>
             </div>
         </div>
@@ -1010,34 +1010,20 @@ function selectOption(idx) {
 function submitMCQ() {
     const q = QUESTIONS[state.currentSection][state.currentIndex];
     const selected = state._selectedOption;
-    const btn = document.getElementById('nextBtn');
+    if (selected === undefined || selected === null) return;
 
-    if (btn.textContent.trim() === 'Næste') {
-        advanceQuestion();
-        return;
-    }
-
-    // Show feedback
+    // Score silently — no feedback shown
     const correct = selected === q.correct;
-    document.querySelectorAll('.option').forEach((o, i) => {
-        o.style.pointerEvents = 'none';
-        if (i === q.correct) o.classList.add('correct');
-        if (i === selected && !correct) o.classList.add('incorrect');
-    });
-
-    const fb = document.getElementById('feedback');
     if (correct) {
-        fb.innerHTML = `<div class="feedback-box feedback-correct">✓ Korrekt!</div>`;
         state.scores[state.currentSection] += levelPoints(q.level);
-    } else {
-        fb.innerHTML = `<div class="feedback-box feedback-incorrect">✗ Forkert. Det rigtige svar er markeret med grønt.</div>`;
     }
 
     state.answers[state.currentSection].push({ level: q.level, correct });
     state.answeredQuestions++;
     updateProgress();
 
-    btn.textContent = 'Næste';
+    // Move directly to next question
+    advanceQuestion();
 }
 
 // ---- LISTENING ----
@@ -1080,7 +1066,7 @@ function renderListeningQuestion(el, q, num, total) {
                     ${num}/${total}
                 </span>
                 <button class="btn btn-primary" id="nextBtn" onclick="submitMCQ()" disabled>
-                    Tjek svar
+                    Næste
                 </button>
             </div>
         </div>
