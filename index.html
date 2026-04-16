@@ -1253,81 +1253,41 @@ function updateWordCount() {
 }
 
 function submitWriting() {
-    const btn = document.getElementById('nextBtn');
-    if (btn.textContent.trim() === 'Næste') { advanceQuestion(); return; }
-
     const text = document.getElementById('writingInput').value.trim();
     const words = text ? text.split(/\s+/).length : 0;
     const q = QUESTIONS.writing[state.currentIndex];
 
     let score = 0;
-    let feedback = [];
 
-    if (words === 0) {
-        feedback.push('Du har ikke skrevet noget.');
-    } else {
-        // Word count check
-        if (words >= q.minWords) {
-            score += 2;
-            feedback.push(`✓ Ordantal OK (${words} ord)`);
-        } else {
-            feedback.push(`✗ For kort (${words}/${q.minWords} ord)`);
-        }
+    if (words > 0) {
+        if (words >= q.minWords) score += 2;
 
-        // Basic Danish detection
         const danishWords = ['og', 'er', 'det', 'en', 'jeg', 'har', 'til', 'at', 'med', 'som', 'kan', 'vil', 'skal', 'den', 'min', 'din', 'ikke', 'men', 'også', 'fra', 'var', 'blev', 'hvor', 'hvad', 'når', 'eller', 'efter', 'over', 'under', 'mellem', 'fordi', 'derfor', 'selvom', 'således', 'imidlertid', 'desuden'];
         const textWords = text.toLowerCase().split(/\s+/);
         const danishCount = textWords.filter(w => danishWords.includes(w)).length;
-        const danishRatio = danishCount / textWords.length;
+        if (danishCount / textWords.length > 0.15) score += 2;
 
-        if (danishRatio > 0.15) {
-            score += 2;
-            feedback.push('✓ Teksten er på dansk');
-        } else {
-            feedback.push('✗ Teksten ser ikke ud til at være på dansk');
-        }
-
-        // Sentence structure
         const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
-        if (sentences.length >= 2) {
-            score += 1;
-            feedback.push(`✓ ${sentences.length} sætninger`);
-        }
+        if (sentences.length >= 2) score += 1;
 
-        // Level-appropriate complexity
-        const avgWordLen = textWords.reduce((a, w) => a + w.length, 0) / textWords.length;
         const complexConnectors = ['desuden', 'imidlertid', 'derimod', 'dog', 'således', 'endvidere', 'tilsyneladende', 'grundlæggende', 'nødvendigvis', 'selvom', 'fordi', 'eftersom', 'trods', 'idet'];
         const usedConnectors = complexConnectors.filter(c => text.toLowerCase().includes(c));
-
         if (q.level === 'C1' || q.level === 'C2') {
-            if (usedConnectors.length >= 2) { score += 2; feedback.push(`✓ Komplekse konnektorer brugt (${usedConnectors.join(', ')})`); }
-            else feedback.push('△ Brug flere komplekse forbindelsesord for dette niveau');
+            if (usedConnectors.length >= 2) score += 2;
         } else if (q.level === 'B2') {
-            if (usedConnectors.length >= 1) { score += 1; feedback.push('✓ God brug af forbindelsesord'); }
+            if (usedConnectors.length >= 1) score += 1;
         } else {
             score += 1;
         }
     }
 
-    // Scale to level points
     const maxPossible = 7;
     const scaledScore = Math.round((score / maxPossible) * levelPoints(q.level));
     state.scores.writing += scaledScore;
     state.answers.writing.push({ level: q.level, score: scaledScore, maxScore: levelPoints(q.level) });
     state.answeredQuestions++;
     updateProgress();
-
-    const fb = document.getElementById('feedback');
-    fb.innerHTML = `
-        <div class="feedback-box feedback-info">
-            <strong>Automatisk vurdering:</strong> ${scaledScore}/${levelPoints(q.level)} point<br>
-            ${feedback.join('<br>')}
-            <br><em style="font-size:0.8rem;">Note: Fuld vurdering af skriveevner kræver en menneskelig bedømmer.</em>
-        </div>
-    `;
-
-    document.getElementById('writingInput').disabled = true;
-    btn.textContent = 'Næste';
+    advanceQuestion();
 }
 
 // ---- SPEAKING ----
@@ -1462,9 +1422,6 @@ function stopRecording() {
 }
 
 function submitSpeaking() {
-    const btn = document.getElementById('nextBtn');
-    if (btn.textContent.trim() === 'Næste') { advanceQuestion(); return; }
-
     stopRecording();
 
     const q = QUESTIONS.speaking[state.currentIndex];
@@ -1473,30 +1430,18 @@ function submitSpeaking() {
     const words = text.trim() ? text.trim().split(/\s+/).length : 0;
 
     let score = 0;
-    let feedback = [];
 
-    if (words === 0) {
-        feedback.push('Ingen tale registreret.');
-    } else {
-        // Word count (longer = more fluent)
-        const expectedWords = q.duration * 1.5; // ~1.5 words per second
+    if (words > 0) {
+        const expectedWords = q.duration * 1.5;
         const fluencyRatio = Math.min(words / expectedWords, 1);
         score += Math.round(fluencyRatio * 3);
-        feedback.push(`✓ ${words} ord registreret`);
 
-        // Danish content
         const danishWords = ['og', 'er', 'det', 'en', 'jeg', 'har', 'til', 'at', 'med', 'som', 'kan', 'vil', 'ikke', 'men', 'også', 'fra', 'min', 'den', 'var'];
         const textWords = text.toLowerCase().split(/\s+/);
         const danishCount = textWords.filter(w => danishWords.includes(w)).length;
-        if (danishCount / textWords.length > 0.1) {
-            score += 2;
-            feedback.push('✓ Dansk tale genkendt');
-        } else {
-            feedback.push('△ Svært at genkende dansk indhold');
-        }
+        if (danishCount / textWords.length > 0.1) score += 2;
 
-        // Sentence length variety
-        if (words > 10) { score += 1; feedback.push('✓ Tilstrækkelig længde'); }
+        if (words > 10) score += 1;
     }
 
     const maxPossible = 6;
@@ -1505,17 +1450,7 @@ function submitSpeaking() {
     state.answers.speaking.push({ level: q.level, score: scaledScore, maxScore: levelPoints(q.level) });
     state.answeredQuestions++;
     updateProgress();
-
-    const fb = document.getElementById('feedback');
-    fb.innerHTML = `
-        <div class="feedback-box feedback-info">
-            <strong>Automatisk vurdering:</strong> ${scaledScore}/${levelPoints(q.level)} point<br>
-            ${feedback.join('<br>')}
-            <br><em style="font-size:0.8rem;">Note: Fuld vurdering af udtale og flydende tale kræver en menneskelig bedømmer.</em>
-        </div>
-    `;
-
-    btn.textContent = 'Næste';
+    advanceQuestion();
 }
 
 // ---- NAVIGATION ----
