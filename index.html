@@ -508,16 +508,64 @@
             flex-wrap: wrap;
         }
 
+        .settings-toggle {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.3rem;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+            padding: 4px;
+        }
+        .settings-toggle:hover { opacity: 1; }
+
+        .settings-panel {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+        .settings-panel h4 { margin-bottom: 8px; }
+        .settings-panel p { font-size: 0.8rem; color: var(--text-light); margin-bottom: 12px; }
+        .settings-panel .key-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .settings-panel input[type="password"],
+        .settings-panel input[type="text"] {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: monospace;
+        }
+        .key-status {
+            font-size: 0.8rem;
+            margin-top: 8px;
+        }
+        .key-status.ok { color: var(--success); }
+        .key-status.missing { color: var(--text-light); }
+
         @media print {
             .header { position: static; box-shadow: none; }
             .results-actions { display: none !important; }
             .progress-bar { display: none; }
+            .settings-toggle { display: none; }
         }
     </style>
 </head>
 <body>
 
-<div class="header">
+<div class="header" style="position:relative;">
+    <button class="settings-toggle" onclick="toggleSettings()" title="Indstillinger">&#9881;</button>
     <h1>Dansk Niveautest</h1>
     <p id="headerSubtitle">Test dit danskniveau fra A2 til C2</p>
     <div class="progress-bar">
@@ -526,6 +574,18 @@
 </div>
 
 <div class="container" id="app">
+    <!-- Settings Panel -->
+    <div id="settings-panel" class="settings-panel hidden">
+        <h4>Stemmeindstillinger</h4>
+        <p>Indtast en Google Gemini API-nøgle for naturlig dansk tale. Nøglen gemmes kun i din browser og sendes aldrig til andre end Google.</p>
+        <div class="key-row">
+            <input type="password" id="apiKeyInput" placeholder="AIza..." autocomplete="off">
+            <button class="btn btn-primary" onclick="saveApiKey()" style="padding:8px 16px; font-size:0.85rem;">Gem</button>
+            <button class="btn btn-outline" onclick="clearApiKey()" style="padding:8px 12px; font-size:0.85rem;">Slet</button>
+        </div>
+        <div class="key-status" id="keyStatus"></div>
+    </div>
+
     <!-- Welcome Screen -->
     <div id="screen-welcome" class="card welcome">
         <div id="prev-results-banner" class="prev-results-banner hidden">
@@ -1029,7 +1089,7 @@ function renderListeningQuestion(el, q, num, total) {
     state._audioText = q.audioText;
 }
 
-function playAudio() {
+async function playAudio() {
     if (state._playCount >= 3) return;
     state._playCount++;
     document.getElementById('playCount').textContent = `${state._playCount}/3 afspilninger`;
@@ -1039,11 +1099,74 @@ function playAudio() {
         document.getElementById('playBtn').style.opacity = '0.5';
     }
 
+    const wave = document.getElementById('audioWave');
+    const apiKey = localStorage.getItem('geminiApiKey');
+
+    if (apiKey) {
+        // Use Gemini TTS for natural Danish voice
+        try {
+            wave.classList.add('playing');
+            document.getElementById('playBtn').disabled = true;
+
+            const response = await fetch(
+                `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        input: { text: state._audioText },
+                        voice: {
+                            languageCode: 'da-DK',
+                            name: 'da-DK-Wavenet-A',
+                            ssmlGender: 'FEMALE'
+                        },
+                        audioConfig: {
+                            audioEncoding: 'MP3',
+                            speakingRate: 0.9,
+                            pitch: 0
+                        }
+                    })
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            const audio = new Audio('data:audio/mp3;base64,' + data.audioContent);
+            audio.onended = () => {
+                wave.classList.remove('playing');
+                if (state._playCount < 3) {
+                    document.getElementById('playBtn').disabled = false;
+                }
+            };
+            audio.onerror = () => {
+                wave.classList.remove('playing');
+                if (state._playCount < 3) {
+                    document.getElementById('playBtn').disabled = false;
+                }
+            };
+            audio.play();
+        } catch (err) {
+            console.warn('Gemini TTS failed, falling back to browser voice:', err);
+            wave.classList.remove('playing');
+            if (state._playCount < 3) {
+                document.getElementById('playBtn').disabled = false;
+            }
+            playAudioFallback();
+        }
+    } else {
+        // Fallback: browser SpeechSynthesis
+        playAudioFallback();
+    }
+}
+
+function playAudioFallback() {
     const utterance = new SpeechSynthesisUtterance(state._audioText);
     utterance.lang = 'da-DK';
     utterance.rate = 0.9;
 
-    // Try to find a Danish voice
     const voices = state.speechSynth.getVoices();
     const daVoice = voices.find(v => v.lang.startsWith('da'));
     if (daVoice) utterance.voice = daVoice;
@@ -1056,10 +1179,46 @@ function playAudio() {
     state.speechSynth.speak(utterance);
 }
 
-// Preload voices
+// Preload voices for fallback
 if (window.speechSynthesis) {
     speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
     speechSynthesis.getVoices();
+}
+
+// Settings panel
+function toggleSettings() {
+    const panel = document.getElementById('settings-panel');
+    panel.classList.toggle('hidden');
+    if (!panel.classList.contains('hidden')) {
+        updateKeyStatus();
+    }
+}
+
+function saveApiKey() {
+    const key = document.getElementById('apiKeyInput').value.trim();
+    if (!key) return;
+    localStorage.setItem('geminiApiKey', key);
+    document.getElementById('apiKeyInput').value = '';
+    updateKeyStatus();
+}
+
+function clearApiKey() {
+    localStorage.removeItem('geminiApiKey');
+    document.getElementById('apiKeyInput').value = '';
+    updateKeyStatus();
+}
+
+function updateKeyStatus() {
+    const status = document.getElementById('keyStatus');
+    const key = localStorage.getItem('geminiApiKey');
+    if (key) {
+        const masked = key.slice(0, 5) + '...' + key.slice(-4);
+        status.className = 'key-status ok';
+        status.textContent = `Gemini-stemme aktiv (${masked})`;
+    } else {
+        status.className = 'key-status missing';
+        status.textContent = 'Ingen nøgle — bruger standard browserstemme';
+    }
 }
 
 // ---- WRITING ----
