@@ -481,6 +481,38 @@
         .feedback-correct { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
         .feedback-incorrect { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
         .feedback-info { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
+
+        .btn-outline {
+            background: white;
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+        .btn-outline:hover { background: #f5f5f5; border-color: #ccc; }
+
+        .prev-results-banner {
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            border-radius: var(--radius);
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #1565c0;
+        }
+
+        .results-actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 32px;
+            flex-wrap: wrap;
+        }
+
+        @media print {
+            .header { position: static; box-shadow: none; }
+            .results-actions { display: none !important; }
+            .progress-bar { display: none; }
+        }
     </style>
 </head>
 <body>
@@ -496,6 +528,12 @@
 <div class="container" id="app">
     <!-- Welcome Screen -->
     <div id="screen-welcome" class="card welcome">
+        <div id="prev-results-banner" class="prev-results-banner hidden">
+            Du har taget testen før!
+            <button class="btn btn-secondary" onclick="showSavedResults()" style="margin-left:12px; padding:6px 16px; font-size:0.85rem;">
+                Se dine resultater
+            </button>
+        </div>
         <div class="flag">🇩🇰</div>
         <h2>Danish Level Test</h2>
         <p style="color:var(--text-light); max-width:520px; margin:0 auto 8px;">
@@ -1447,8 +1485,10 @@ function showResults() {
             <h3 style="margin:24px 0 12px;">Anbefalinger</h3>
             <div id="recommendations"></div>
 
-            <div class="actions" style="justify-content:center; margin-top:32px;">
+            <div class="results-actions">
                 <button class="btn btn-primary" onclick="location.reload()">Tag testen igen</button>
+                <button class="btn btn-secondary" onclick="downloadResults()">Download resultater</button>
+                <button class="btn btn-outline" onclick="window.print()">Print</button>
             </div>
         </div>
     `;
@@ -1474,6 +1514,31 @@ function showResults() {
         </div>
     `).join('');
 
+    // Save results to localStorage
+    const resultsData = {
+        date: new Date().toISOString(),
+        overallLevel,
+        overallPct: Math.round(overallPct * 100),
+        totalScore,
+        totalMax,
+        skills: {}
+    };
+    for (const skill of ['reading', 'listening', 'writing', 'speaking']) {
+        const pct = maxScores[skill] > 0 ? Math.round((state.scores[skill] / maxScores[skill]) * 100) : 0;
+        resultsData.skills[skill] = {
+            score: state.scores[skill],
+            max: maxScores[skill],
+            pct,
+            level: skillLevel(skill)
+        };
+    }
+    // Save history (keep last 10 attempts)
+    let history = JSON.parse(localStorage.getItem('danishTestHistory') || '[]');
+    history.push(resultsData);
+    if (history.length > 10) history = history.slice(-10);
+    localStorage.setItem('danishTestHistory', JSON.stringify(history));
+    localStorage.setItem('danishTestLatest', JSON.stringify(resultsData));
+
     // Animate bars
     setTimeout(() => {
         document.querySelectorAll('.skill-bar-fill').forEach(bar => {
@@ -1481,6 +1546,135 @@ function showResults() {
         });
     }, 100);
 }
+
+// Show saved results from localStorage
+function showSavedResults() {
+    const saved = JSON.parse(localStorage.getItem('danishTestLatest'));
+    if (!saved) return;
+
+    const skillNames = { reading: 'Læseforståelse', listening: 'Høreforståelse', writing: 'Skriftlig fremstilling', speaking: 'Mundtlig kommunikation' };
+    const skillColors = { reading: '#2196f3', listening: '#4caf50', writing: '#e91e63', speaking: '#ff9800' };
+    const levelDescriptions = {
+        A2: 'You can handle basic, routine situations and understand simple texts about familiar topics. Equivalent to Prøve i Dansk 1.',
+        B1: 'You can deal with most situations while travelling in Denmark and produce simple connected text. Equivalent to Prøve i Dansk 2 (required for permanent residency).',
+        B2: 'You can interact fluently and understand complex texts on both concrete and abstract topics. Equivalent to Prøve i Dansk 3 (required for Danish citizenship).',
+        C1: 'You can express yourself fluently and use language flexibly for academic and professional purposes. Equivalent to Studieprøven (required for university admission).',
+        C2: 'You can understand virtually everything and express yourself spontaneously with precision. Near-native mastery of Danish.'
+    };
+
+    document.getElementById('screen-welcome').classList.add('hidden');
+    const el = document.getElementById('screen-results');
+    el.classList.remove('hidden');
+
+    const testDate = new Date(saved.date).toLocaleDateString('da-DK', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+    // Build history table if multiple attempts
+    const history = JSON.parse(localStorage.getItem('danishTestHistory') || '[]');
+    let historyHtml = '';
+    if (history.length > 1) {
+        historyHtml = `
+            <h3 style="margin:24px 0 12px;">Testhistorik</h3>
+            <table class="cefr-table">
+                <tr><th>Dato</th><th>Niveau</th><th>Score</th></tr>
+                ${history.slice().reverse().map(h => {
+                    const d = new Date(h.date).toLocaleDateString('da-DK', { day: 'numeric', month: 'short', year: 'numeric' });
+                    return `<tr><td>${d}</td><td><span class="level-badge level-${h.overallLevel}">${h.overallLevel}</span></td><td>${h.overallPct}%</td></tr>`;
+                }).join('')}
+            </table>
+        `;
+    }
+
+    el.innerHTML = `
+        <div class="card">
+            <div style="text-align:center; font-size:0.85rem; color:var(--text-light); margin-bottom:8px;">
+                Dine seneste resultater — ${testDate}
+            </div>
+            <div class="overall-result">
+                <div style="font-size:0.9rem; opacity:0.8;">Dit estimerede danskniveau</div>
+                <div class="level">${saved.overallLevel}</div>
+                <div style="margin-top:12px; font-size:0.9rem;">${saved.totalScore} / ${saved.totalMax} point (${saved.overallPct}%)</div>
+            </div>
+            <p style="color:var(--text-light); font-size:0.9rem; text-align:center; margin: 16px 0;">
+                ${levelDescriptions[saved.overallLevel]}
+            </p>
+            <h3 style="margin:24px 0 12px;">Resultater pr. færdighed</h3>
+            <div class="skill-breakdown">
+                ${['reading', 'listening', 'writing', 'speaking'].map(skill => {
+                    const s = saved.skills[skill];
+                    return `
+                        <div class="skill-row">
+                            <span style="width:160px; font-size:0.9rem;">${skillNames[skill]}</span>
+                            <div class="skill-bar-bg">
+                                <div class="skill-bar-fill" style="width:${s.pct}%; background:${skillColors[skill]}"></div>
+                            </div>
+                            <span class="level-badge level-${s.level}" style="min-width:36px; text-align:center;">${s.level}</span>
+                            <span style="font-size:0.8rem; color:var(--text-light); min-width:40px; text-align:right;">${s.pct}%</span>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+            ${historyHtml}
+            <div class="results-actions">
+                <button class="btn btn-primary" onclick="backToWelcome()">Tag testen igen</button>
+                <button class="btn btn-secondary" onclick="downloadResults()">Download resultater</button>
+                <button class="btn btn-outline" onclick="window.print()">Print</button>
+            </div>
+        </div>
+    `;
+}
+
+function backToWelcome() {
+    document.getElementById('screen-results').classList.add('hidden');
+    document.getElementById('screen-results').innerHTML = '';
+    document.getElementById('screen-welcome').classList.remove('hidden');
+}
+
+// Download results as text file
+function downloadResults() {
+    const saved = JSON.parse(localStorage.getItem('danishTestLatest'));
+    if (!saved) return;
+
+    const skillNames = { reading: 'Læseforståelse', listening: 'Høreforståelse', writing: 'Skriftlig fremstilling', speaking: 'Mundtlig kommunikation' };
+    const date = new Date(saved.date).toLocaleDateString('da-DK', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+    let text = `DANSK NIVEAUTEST — RESULTATER\n`;
+    text += `${'='.repeat(40)}\n`;
+    text += `Dato: ${date}\n\n`;
+    text += `SAMLET NIVEAU: ${saved.overallLevel}\n`;
+    text += `Score: ${saved.totalScore} / ${saved.totalMax} (${saved.overallPct}%)\n\n`;
+    text += `FÆRDIGHEDER\n${'-'.repeat(40)}\n`;
+    for (const skill of ['reading', 'listening', 'writing', 'speaking']) {
+        const s = saved.skills[skill];
+        text += `${skillNames[skill].padEnd(25)} ${s.level}  ${s.pct}%  (${s.score}/${s.max})\n`;
+    }
+
+    // Include history if available
+    const history = JSON.parse(localStorage.getItem('danishTestHistory') || '[]');
+    if (history.length > 1) {
+        text += `\nTESTHISTORIK\n${'-'.repeat(40)}\n`;
+        history.slice().reverse().forEach(h => {
+            const d = new Date(h.date).toLocaleDateString('da-DK', { day: 'numeric', month: 'short', year: 'numeric' });
+            text += `${d.padEnd(20)} ${h.overallLevel}  ${h.overallPct}%\n`;
+        });
+    }
+
+    text += `\n${'='.repeat(40)}\nDansk Niveautest — https://frederik-cpu.github.io/danish-level-test/\n`;
+
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `dansk-niveautest-${saved.overallLevel}-${new Date().toISOString().slice(0,10)}.txt`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+}
+
+// Check for saved results on page load
+(function checkSavedResults() {
+    const saved = localStorage.getItem('danishTestLatest');
+    if (saved) {
+        document.getElementById('prev-results-banner').classList.remove('hidden');
+    }
+})()
 </script>
 
 </body>
